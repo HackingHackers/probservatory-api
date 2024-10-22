@@ -11,7 +11,17 @@ from email import encoders
 from shutil import copy2
 from time import sleep
 
-'''This part pass the parameters to virgo'''
+def observe_star(scan_points, obs_func, obs_param, obs_name, spectrometer, filepath):
+    '''this function finds the way of making observation while moving the telescope in certain direction
+    * in obs_param
+    the time should be duration/steps
+    '''
+    for i in scan_points:
+        leg_l = calculate_leg_lengths(i[0], i[1], 0)
+        final_legs = ac.send_serial(leg_l, original=False)
+        if max(np.abs(leg_l=final_legs))<0.01:
+            obs_func(obs_param, spectrometer = spectrometer, obs_file = filepath+'/'+obs_name+i[0]+'-'+i[1]+'.dat')
+    return 'observation finished, and file path is :' + filepath+'/'
 
 
 while True:
@@ -19,6 +29,7 @@ while True:
         #Get observation parameters
         sleep(10)
         try:
+            # here we are not using the php to get responde, need to change to another language
             response = requests.get('https://pictortelescope.com/last_obs.txt', auth=('pictor', 'XXX')) #plaintext credentials
             if response.status_code == 200:
                 exec(response.content)
@@ -250,9 +261,3 @@ Your observation's averaged spectrum, dynamic spectrum (waterfall) and Power vs 
     except Exception as e:
         print(e)
         pass
-
-		
-def save_observe(initial_file = 'observation.dat', save_location = ''):
-	'''this function fft the original time series data to frequency / intensity, 
-	get the positional information of the three linear actuators
-	and return a panda dataframe to the outer part'''

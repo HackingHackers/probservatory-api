@@ -134,6 +134,7 @@ def animate(i):
     for j, text in enumerate(leg_length_texts):
         text.set_text(f'Leg {j+1} Length: {leg_lengths[j]:.2f} m')
     
+    
     return sun_plot, manipulator_base, manipulator_platform, *legs, *top_platform_lines, *leg_length_texts
 
 # Create the animation
